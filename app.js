@@ -1,3 +1,5 @@
+// app.js
+
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -6,15 +8,9 @@ const mongoose = require('mongoose');
 const path = require('path');
 const dotenv = require('dotenv');
 const MongoStore = require('connect-mongo');
-const { OpenAI } = require('openai');
 
 // Carregar variáveis de ambiente
 dotenv.config();
-
-// Configuração da API OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 // Conectar ao MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
@@ -22,7 +18,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   useUnifiedTopology: true,
 })
 .then(() => console.log('Conectado ao MongoDB'))
-.catch(err => console.log('Erro ao conectar ao MongoDB:', err));
+.catch(err => console.error('Erro ao conectar ao MongoDB:', err));
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -54,8 +50,9 @@ app.use(passport.session());
 // Middleware do Flash
 app.use(flash());
 
-// Definir variáveis globais para mensagens flash
+// Definir variáveis globais para mensagens flash e usuário autenticado
 app.use((req, res, next) => {
+  res.locals.user = req.user || null; // Torna o usuário disponível nas views
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   res.locals.error = req.flash('error');
@@ -72,6 +69,11 @@ app.use('/calendar', require('./routes/calendar'));
 app.use('/tasks', require('./routes/tasks'));
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/profile', require('./routes/profile'));
+
+// Rota raiz redirecionando para o dashboard
+app.get('/', (req, res) => {
+  res.redirect('/dashboard');
+});
 
 // Iniciar o servidor
 app.listen(port, () => console.log(`Servidor rodando na porta ${port}`));

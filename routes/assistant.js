@@ -3,14 +3,16 @@
 const express = require('express');
 const router = express.Router();
 const { OpenAI } = require('openai');
+const dotenv = require('dotenv');
+dotenv.config();
 
-// Configuração da API OpenAI (já foi configurada no seu arquivo principal, então podemos reutilizar)
+// Configuração da API OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Rota para interagir com a assistente virtual
-router.post('/', async (req, res) => {
+router.post('/chat', async (req, res) => {
   const { conversationHistory } = req.body;
 
   console.log('Requisição recebida em /chat');

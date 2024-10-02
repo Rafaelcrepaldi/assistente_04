@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Tarefa: <%= task.title %></title>
+  <!-- Incluindo o CSS do Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Seu arquivo CSS personalizado -->
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <!-- Barra de Navegação -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">MeuApp</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="/tasks">Tarefas</a></li>
+        <li class="nav-item"><a class="nav-link" href="/profile">Perfil</a></li>
+        <li class="nav-item"><a class="nav-link" href="/auth/logout">Sair</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Conteúdo Principal -->
+  <div class="container mt-5">
+    <h1>Tarefa: <%= task.title %></h1>
+    <p><strong>Status:</strong> <% if (task.completed) { %> Concluída <% } else { %> Pendente <% } %></p>
+    <p><strong>Descrição:</strong> <%= task.description || 'Nenhuma descrição fornecida.' %></p>
+    <p><strong>Data de Criação:</strong> <%= task.createdAt.toLocaleDateString() %></p>
+
+    <!-- Botões de ação -->
+    <a href="/tasks/edit/<%= task._id %>" class="btn btn-secondary">Editar</a>
+    <a href="/tasks/delete/<%= task._id %>" class="btn btn-danger">Excluir</a>
+    <a href="/dashboard" class="btn btn-primary">Voltar ao Dashboard</a>
+  </div>
+
+  <!-- Scripts do Bootstrap e jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
