@@ -1,68 +1,77 @@
-// Importações necessárias
 const express = require('express');
-const axios = require('axios');
+const session = require('express-session');
+const passport = require('passport');
+const flash = require('connect-flash');
+const mongoose = require('mongoose');
+const path = require('path');
 const dotenv = require('dotenv');
-const OpenAI = require('openai'); // Importação correta
+const MongoStore = require('connect-mongo');
+const { OpenAI } = require('openai');
 
 // Carregar variáveis de ambiente
 dotenv.config();
 
-// Configurar a API OpenAI
+// Configuração da API OpenAI
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY // Certifique-se de que a variável de ambiente está configurada
+  apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Conectar ao MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('Conectado ao MongoDB'))
+.catch(err => console.log('Erro ao conectar ao MongoDB:', err));
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware para permitir o uso de JSON
+// Configurar EJS como motor de templates
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Middleware para parsing de JSON e dados de formulários
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Rota principal da assistente
-app.post('/assistente', async (req, res) => {
-  const userPrompt = req.body.prompt; // Prompt vindo da requisição do usuário
+// Configurar sessão
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+  }),
+  cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1 dia
+}));
 
-  try {
-    // Fazer requisição para a API da OpenAI usando GPT-4 com streaming
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: userPrompt }],
-      stream: true,
-    });
+// Inicializar Passport.js e sessão
+require('./config/passport')(passport); // Carregar a configuração do Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
-    // Configurar o cabeçalho da resposta para indicar que é um stream
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
+// Middleware do Flash
+app.use(flash());
 
-    // Manter a conexão aberta
-    res.flushHeaders();
-
-    // Tratamento do streaming de dados
-    for await (const part of response) {
-      const content = part.choices[0]?.delta?.content || '';
-      process.stdout.write(content); // Saída no console
-      res.write(content); // Enviar chunk para o cliente
-    }
-
-    // Terminar a resposta
-    res.end();
-
-  } catch (error) {
-    console.error(
-      'Erro ao acessar a API OpenAI:',
-      error.response ? error.response.data : error.message
-    );
-    // Certifique-se de que a resposta não foi enviada ainda
-    if (!res.headersSent) {
-      res.status(500).json({ error: 'Erro ao processar a solicitação da assistente' });
-    } else {
-      res.end();
-    }
-  }
+// Definir variáveis globais para mensagens flash
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  next();
 });
+
+// Servir arquivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Configurar rotas
+app.use('/auth', require('./routes/auth'));
+app.use('/chat', require('./routes/assistant')); // Rota para o chat
+app.use('/calendar', require('./routes/calendar'));
+app.use('/tasks', require('./routes/tasks'));
+app.use('/dashboard', require('./routes/dashboard'));
+app.use('/profile', require('./routes/profile'));
 
 // Iniciar o servidor
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
-});
+app.listen(port, () => console.log(`Servidor rodando na porta ${port}`));

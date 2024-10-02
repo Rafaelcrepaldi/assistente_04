@@ -1,19 +1,32 @@
 {
-  "name": "assistente_04",
+  "name": "projeto-assistente",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Assistente virtual com gerenciamento de tempo, tarefas e integração com Google Calendar",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "axios": "^1.7.7",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "openai": "^4.67.0"
+    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^4.6.0",
+    "dotenv": "^10.0.0",
+    "ejs": "^3.1.10",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "googleapis": "^144.0.0",
+    "mongodb": "^4.17.2",
+    "mongoose": "^5.13.3",
+    "openai": "^4.67.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "simple-update-notifier": "^2.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }
