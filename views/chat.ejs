@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat com IA e Criação de Exercícios</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">MeuApp</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar Navegação">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/exercises">exercicios</a></li>
+                <li class="nav-item active"><a class="nav-link" href="/chat">chat</a></li>
+                <li class="nav-item"><a class="nav-link" href="/tasks">Tarefas</a></li>
+                <li class="nav-item "><a class="nav-link" href="/profile">Perfil</a></li>
+                <li class="nav-item"><a class="nav-link" href="/auth/logout">Sair</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Chat com GPT e Criação de Exercícios</h1>
+
+        <!-- Seletor de Modelos de IA -->
+        <div class="form-group">
+            <label for="ai-model">Selecione um Modelo de IA:</label>
+            <select id="ai-model" class="form-control">
+                <option value="professor_programacao">Professor de Programação</option>
+                <option value="professor_ingles">Professor de Inglês</option>
+                <option value="professor_portugues">Professor de Português</option>
+                <option value="professor_matematica">Professor de Matemática e Exatas</option>
+                <option value="assistente_pessoal">Assistente Pessoal</option>
+            </select>
+        </div>
+
+        <!-- Campo para solicitar um tema de exercício -->
+        <div class="form-group">
+            <label for="exercise-topic">Tema para exercício/prova:</label>
+            <input type="text" id="exercise-topic" class="form-control" placeholder="Digite o tema para gerar exercícios ou provas">
+        </div>
+
+        <!-- Botão para iniciar a criação de exercícios -->
+        <div class="form-group">
+            <button id="generate-exercise-btn" class="btn btn-success">Gerar Exercícios</button>
+            <span id="loading-msg" style="display: none;">Gerando exercícios, por favor aguarde...</span> <!-- Indicador de carregamento -->
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <!-- Botão para iniciar uma nova conversa -->
+                <button id="new-chat-btn" class="btn btn-secondary mb-3">Nova Conversa</button>
+
+                <!-- Janela de chat -->
+                <div id="chat-window" style="height: 400px; overflow-y: auto;"></div>
+            </div>
+            <div class="card-footer">
+                <form id="chat-form" class="input-group">
+                    <input type="text" id="chat-input" class="form-control" placeholder="Digite sua mensagem..." autocomplete="off" required />
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 MeuApp - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const newChatBtn = document.getElementById('new-chat-btn');
+        const generateExerciseBtn = document.getElementById('generate-exercise-btn');
+        const aiModelSelect = document.getElementById('ai-model');
+        const exerciseTopicInput = document.getElementById('exercise-topic');
+        const loadingMsg = document.getElementById('loading-msg');
+
+        let conversationHistory = [];
+        let selectedModel = 'professor_programacao'; // Modelo de IA padrão
+
+        // Função para adicionar mensagens ao chat
+        function addMessageToChat(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', 'mb-2');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Função para iniciar uma nova conversa
+        newChatBtn.addEventListener('click', () => {
+            conversationHistory = [];  // Limpa o histórico de conversa
+            chatWindow.innerHTML = ''; // Limpa a janela de chat
+            addMessageToChat('Sistema', 'Novo chat iniciado. Selecione um modelo e envie sua mensagem.');
+        });
+
+        // Mudança no seletor de IA
+        aiModelSelect.addEventListener('change', () => {
+            selectedModel = aiModelSelect.value;  // Atualiza o modelo de IA selecionado
+        });
+
+        // Função para enviar uma mensagem para a IA (chat regular)
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            addMessageToChat('Você', userMessage);
+            chatInput.value = '';
+
+            conversationHistory.push({ role: 'user', content: userMessage });
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversationHistory,
+                        model: selectedModel
+                    })
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    addMessageToChat('Erro', data.error);
+                } else {
+                    const botMessage = data.message;
+                    conversationHistory.push({ role: 'assistant', content: botMessage });
+                    addMessageToChat('Assistente', botMessage);
+                }
+            } catch (error) {
+                addMessageToChat('Erro', 'Não foi possível se comunicar com o servidor.');
+            }
+        });
+
+        // Função para gerar exercícios
+        generateExerciseBtn.addEventListener('click', async () => {
+            const exerciseTopic = exerciseTopicInput.value.trim();
+            if (!exerciseTopic) {
+                alert('Por favor, forneça um tema para os exercícios.');
+                return;
+            }
+
+            loadingMsg.style.display = 'inline'; // Mostra a mensagem de carregamento
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversationHistory: [],
+                        model: selectedModel,
+                        exerciseTopic: exerciseTopic // Envia o tema junto com o modelo
+                    })
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    addMessageToChat('Erro', data.error);
+                } else {
+                    addMessageToChat('Assistente', `Exercícios criados sobre o tema "${exerciseTopic}".`);
+                    exerciseTopicInput.value = ''; // Limpa o campo após gerar os exercícios
+                }
+            } catch (error) {
+                addMessageToChat('Erro', 'Erro ao gerar exercícios.');
+            } finally {
+                loadingMsg.style.display = 'none'; // Oculta a mensagem de carregamento
+            }
+        });
+    </script>
+</body>
+</html>

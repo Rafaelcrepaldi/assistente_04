@@ -17,9 +17,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="/exercises">exercicios</a></li>
+                <li class="nav-item"><a class="nav-link" href="/chat">chat</a></li>
                 <li class="nav-item"><a class="nav-link" href="/tasks">Tarefas</a></li>
-                <li class="nav-item"><a class="nav-link" href="/profile">Perfil</a></li>
+                <li class="nav-item active"><a class="nav-link" href="/profile">Perfil</a></li>
                 <li class="nav-item"><a class="nav-link" href="/auth/logout">Sair</a></li>
             </ul>
         </div>
@@ -56,12 +57,17 @@
                 <a href="/tasks/add" class="btn btn-primary mt-3">Adicionar Nova Tarefa</a>
             </div>
 
-            <!-- Coluna do Chat -->
+           <!-- Coluna do Chat -->
             <div class="col-md-6">
                 <h2>Chat com o GPT</h2>
                 <div id="chat-container" class="card">
-                    <div id="chat-window" class="card-body" style="height: 400px; overflow-y: auto;">
-                        <!-- Mensagens serão exibidas aqui -->
+                    <div class="card-body">
+                        <!-- Botão para iniciar um novo chat -->
+                        <button id="new-chat-btn" class="btn btn-secondary mb-3">Novo Chat</button>
+
+                        <div id="chat-window" style="height: 400px; overflow-y: auto;">
+                            <!-- Mensagens serão exibidas aqui -->
+                        </div>
                     </div>
                     <div class="card-footer">
                         <form id="chat-form" class="input-group">
@@ -76,6 +82,11 @@
         </div>
     </div>
 
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 MeuApp - Todos os direitos reservados</p>
+        </div>
+    </footer>
     <!-- Scripts do Bootstrap e jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -85,9 +96,26 @@
         const chatWindow = document.getElementById('chat-window');
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
+        const newChatBtn = document.getElementById('new-chat-btn');
 
-        // Armazena o histórico da conversa
+        // Armazena o histórico da conversa (inicializado como um array vazio)
         let conversationHistory = [];
+
+        // Função para adicionar mensagens ao chat
+        function addMessageToChat(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', 'mb-2');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Função para iniciar um novo chat
+        newChatBtn.addEventListener('click', () => {
+            conversationHistory = []; // Limpa o histórico de conversa
+            chatWindow.innerHTML = ''; // Limpa o conteúdo da janela de chat
+            addMessageToChat('Sistema', 'Novo chat iniciado. Envie sua mensagem.');
+        });
 
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -128,6 +156,7 @@
                 addMessageToChat('Erro', 'Não foi possível se comunicar com o servidor.');
             }
         });
+
 
         function addMessageToChat(sender, message) {
             const messageElement = document.createElement('div');

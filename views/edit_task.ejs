@@ -9,8 +9,21 @@
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  <!-- Barra de Navegação -->
-  <!-- ... navbar ... -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">MeuApp</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar Navegação">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" href="/exercises">exercicios</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chat">chat</a></li>
+            <li class="nav-item"><a class="nav-link" href="/tasks">Tarefas</a></li>
+            <li class="nav-item active"><a class="nav-link" href="/profile">Perfil</a></li>
+            <li class="nav-item"><a class="nav-link" href="/auth/logout">Sair</a></li>
+        </ul>
+    </div>
+  </nav>
 
   <div class="container mt-5">
     <h1>Editar Tarefa</h1>
@@ -28,6 +41,12 @@
       <a href="/dashboard" class="btn btn-secondary">Cancelar</a>
     </form>
   </div>
+
+  <footer>
+    <div class="container">
+        <p>&copy; 2024 MeuApp - Todos os direitos reservados</p>
+    </div>
+</footer>
 
   <!-- Scripts do Bootstrap e jQuery -->
   <!-- ... -->

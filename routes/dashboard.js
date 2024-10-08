@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated } = require('../middlewares/auth');
-const Task = require('../models/Task');
 
-// Exibir o Dashboard
-router.get('/', ensureAuthenticated, async (req, res) => {
-    const tasks = await Task.find({ user: req.user._id });
-    res.render('dashboard', { user: req.user, tasks });
+// Rota para exibir o Dashboard
+router.get('/', ensureAuthenticated, (req, res) => {
+    // Removemos as tarefas daqui, já que elas serão manipuladas em `/tasks`
+    res.render('dashboard', { user: req.user });
 });
 
 module.exports = router;

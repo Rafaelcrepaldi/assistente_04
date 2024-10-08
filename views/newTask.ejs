@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Nova Tarefa</title>
+    <!-- Incluindo o CSS do Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">ASSTUDO</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar Navegação">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+              <li class="nav-item"><a class="nav-link" href="/exercises">Exercicios</a></li>
+              <li class="nav-item"><a class="nav-link" href="/chat">Chat</a></li>
+              <li class="nav-item active"><a class="nav-link" href="/tasks">Tarefas</a></li>
+              <li class="nav-item"><a class="nav-link" href="/profile">Perfil</a></li>
+              <li class="nav-item"><a class="nav-link" href="/auth/logout">Sair</a></li>
+          </ul>
+      </div>
+  </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container mt-5">
+        <h1>Adicionar Nova Tarefa</h1>
+        
+        <!-- Formulário de Adição de Tarefa -->
+        <!-- O formulário envia os dados para o backend para criar uma nova tarefa -->
+        <form action="/tasks/add" method="POST">
+            <!-- Campo para o título da tarefa -->
+            <div class="form-group">
+                <label for="title">Título da Tarefa</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Digite o título da tarefa" required>
+            </div>
+
+            <!-- Campo para descrição da tarefa -->
+            <div class="form-group">
+                <label for="description">Descrição da Tarefa</label>
+                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Digite a descrição da tarefa"></textarea>
+            </div>
+
+            <!-- Campo para o status da tarefa (se já está completa ou não) -->
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="completed" name="completed">
+                <label class="form-check-label" for="completed">Tarefa Completa?</label>
+            </div>
+
+            <!-- Botão para submeter o formulário -->
+            <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+
+            <!-- Botão para voltar à página de tarefas -->
+            <a href="/tasks" class="btn btn-secondary ml-2">Cancelar</a>
+        </form>
+    </div>
+
+    <footer>
+      <div class="container">
+          <p>&copy; 2024 MeuApp - Todos os direitos reservados</p>
+      </div>
+  </footer>
+
+    <!-- Incluindo Scripts do Bootstrap e jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

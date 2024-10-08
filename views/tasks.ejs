@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar Tarefas</title>
+    <!-- Incluindo o CSS do Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">MeuApp</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar Navegação">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/exercises">exercicios</a></li>
+                <li class="nav-item"><a class="nav-link" href="/chat">chat</a></li>
+                <li class="nav-item active"><a class="nav-link" href="/tasks">Tarefas</a></li>
+                <li class="nav-item"><a class="nav-link" href="/profile">Perfil</a></li>
+                <li class="nav-item"><a class="nav-link" href="/auth/logout">Sair</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container mt-5">
+        <h1 class="mb-4">Gerenciar Tarefas</h1>
+
+        <!-- Formulário para adicionar uma nova tarefa -->
+        <div class="card mb-4">
+            <div class="card-header">
+                Criar Nova Tarefa
+            </div>
+            <div class="card-body">
+                <form id="task-form">
+                    <div class="form-group">
+                        <label for="task-title">Título da Tarefa</label>
+                        <input type="text" class="form-control" id="task-title" name="title" placeholder="Digite o título da tarefa" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-description">Descrição da Tarefa</label>
+                        <textarea class="form-control" id="task-description" name="description" placeholder="Digite a descrição da tarefa"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-date">Data</label>
+                        <input type="date" class="form-control" id="task-date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-time">Horário</label>
+                        <input type="time" class="form-control" id="task-time" name="time" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+        <!-- Conteúdo Principal -->
+    <div class="container mt-5">
+        <h1 class="mb-4">Minhas Tarefas</h1>
+
+        <!-- Verifica se há tarefas e exibe uma lista -->
+        <% if (tasks && tasks.length > 0) { %>
+            <ul class="list-group">
+                <% tasks.forEach(function(task) { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <!-- Exibe o status de conclusão -->
+                            <input type="checkbox" class="task-checkbox" data-task-id="<%= task._id %>" <% if (task.completed) { %> checked <% } %> />
+                            <span class="<% if (task.completed) { %>text-muted text-decoration-line-through<% } %>">
+                                <strong>Título:</strong> <%= task.title %>
+                            </span>
+                            <p><strong>Descrição:</strong> <%= task.description %></p>
+                            <!-- Exibir data e horário -->
+                            <p><strong>Data e Horário:</strong> <%= new Date(task.date).toLocaleDateString() %> - <%= new Date(task.time).toLocaleTimeString() %></p>
+                        </div>
+                        <div>
+                            <!-- Botões de ação -->
+                            <a href="/tasks/edit/<%= task._id %>" class="btn btn-sm btn-secondary">Editar</a>
+                            <a href="/tasks/delete/<%= task._id %>" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir esta tarefa?')">Excluir</a>
+                        </div>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>Você ainda não tem tarefas. Clique em "Adicionar Nova Tarefa" para começar.</p>
+        <% } %>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 MeuApp - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <!-- Scripts do Bootstrap e jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Lógica para criar uma nova tarefa -->
+    <script>
+        const taskForm = document.getElementById('task-form');
+        taskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+    
+            const title = document.getElementById('task-title').value.trim();
+            const description = document.getElementById('task-description').value.trim();
+            const date = document.getElementById('task-date').value; // Capturando a data
+            const time = document.getElementById('task-time').value; // Capturando o horário
+    
+            if (title === "" || date === "" || time === "") {
+                alert('Todos os campos são obrigatórios!');
+                return;
+            }
+    
+            try {
+                const response = await fetch('/tasks/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, description, date, time })
+                });
+    
+                if (response.ok) { // Verifica se a resposta foi bem-sucedida
+                    alert('Tarefa adicionada com sucesso!');
+                    window.location.reload(); // Recarregar a página para mostrar a nova tarefa
+                } else {
+                    const data = await response.json();
+                    alert(`Erro: ${data.message || 'Erro ao adicionar tarefa.'}`);
+                }
+            } catch (error) {
+                console.error('Erro ao adicionar a tarefa:', error);
+                alert('Erro ao adicionar a tarefa.');
+            }
+        });
+    
+        // Lógica para atualizar o status da tarefa
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', async function () {
+                const taskId = this.getAttribute('data-task-id');
+                const completed = this.checked;
+    
+                try {
+                    const response = await fetch(`/tasks/update-status/${taskId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ completed })
+                    });
+    
+                    const result = await response.json();
+                    if (!result.success) {
+                        alert('Erro ao atualizar o status da tarefa');
+                    }
+                } catch (error) {
+                    console.error('Erro ao atualizar a tarefa:', error);
+                    alert('Erro ao atualizar a tarefa');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

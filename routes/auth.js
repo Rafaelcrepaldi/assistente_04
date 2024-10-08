@@ -72,11 +72,22 @@ router.post('/register', (req, res) => {
 // Processar login (POST)
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', {
-    successRedirect: '/dashboard',  // Redireciona para o dashboard em caso de sucesso
-    failureRedirect: '/auth/login', // Redireciona para login em caso de falha
-    failureFlash: true              // Ativa mensagens flash para erros de login
+      successRedirect: '/tasks',  // Redireciona para a página de tarefas após login bem-sucedido
+      failureRedirect: '/auth/login',
+      failureFlash: true
   })(req, res, next);
 });
+
+router.get('/logout', (req, res) => {
+  req.logout((err) => {
+      if (err) {
+          return next(err);
+      }
+      req.flash('success_msg', 'Você saiu da sua conta.');
+      res.redirect('/auth/login'); // Redireciona para a página de login após logout
+  });
+});
+
 
 
 module.exports = router;

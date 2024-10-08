@@ -1,5 +1,3 @@
-// app.js
-
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -9,7 +7,8 @@ const path = require('path');
 const dotenv = require('dotenv');
 const MongoStore = require('connect-mongo');
 
-// Carregar variáveis de ambiente
+
+// Carregar variáveis de ambiente do arquivo .env
 dotenv.config();
 
 // Conectar ao MongoDB
@@ -43,7 +42,7 @@ app.use(session({
 }));
 
 // Inicializar Passport.js e sessão
-require('./config/passport')(passport); // Carregar a configuração do Passport
+require('./config/passport')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -52,7 +51,7 @@ app.use(flash());
 
 // Definir variáveis globais para mensagens flash e usuário autenticado
 app.use((req, res, next) => {
-  res.locals.user = req.user || null; // Torna o usuário disponível nas views
+  res.locals.user = req.user || null;
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   res.locals.error = req.flash('error');
@@ -64,16 +63,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Configurar rotas
 app.use('/auth', require('./routes/auth'));
-app.use('/chat', require('./routes/assistant')); // Rota para o chat
-app.use('/calendar', require('./routes/calendar'));
+app.use('/chat', require('./routes/assistant')); // Certifique-se de que está carregando a rota corretamente
 app.use('/tasks', require('./routes/tasks'));
-app.use('/dashboard', require('./routes/dashboard'));
 app.use('/profile', require('./routes/profile'));
+app.use('/exercises', require('./routes/exercises'));
 
-// Rota raiz redirecionando para o dashboard
+// Rota raiz redirecionando para o perfil ou tarefas
 app.get('/', (req, res) => {
-  res.redirect('/dashboard');
+  res.redirect('/chat');
 });
 
 // Iniciar o servidor
 app.listen(port, () => console.log(`Servidor rodando na porta ${port}`));
+
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
+
+// Servir arquivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
