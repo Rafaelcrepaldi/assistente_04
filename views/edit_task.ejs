@@ -16,14 +16,17 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a class="nav-link" href="/exercises">exercicios</a></li>
-            <li class="nav-item"><a class="nav-link" href="/chat">chat</a></li>
-            <li class="nav-item"><a class="nav-link" href="/tasks">Tarefas</a></li>
-            <li class="nav-item active"><a class="nav-link" href="/profile">Perfil</a></li>
+            <li class="nav-item active">
+                <span class="nav-link">Pontos: <strong><%= user.points %></strong></span>
+              </li>
+            <li class="nav-item"><a class="nav-link" href="/exercises">Exercicios</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chat">Chat</a></li>
+            <li class="nav-item active"><a class="nav-link" href="/tasks">Tarefas</a></li>
+            <li class="nav-item"><a class="nav-link" href="/profile">Perfil</a></li>
             <li class="nav-item"><a class="nav-link" href="/auth/logout">Sair</a></li>
         </ul>
     </div>
-  </nav>
+</nav>
 
   <div class="container mt-5">
     <h1>Editar Tarefa</h1>

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Visualizar Exercício</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
@@ -14,25 +17,52 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="/exercises">exercicios</a></li>
-                <li class="nav-item"><a class="nav-link" href="/chat">chat</a></li>
+                <li class="nav-item active">
+                    <span class="nav-link">Pontos: <strong><%= user.points %></strong></span>
+                  </li>
+                <li class="nav-item active"><a class="nav-link" href="/exercises">Exercicios</a></li>
+                <li class="nav-item"><a class="nav-link" href="/chat">Chat</a></li>
                 <li class="nav-item"><a class="nav-link" href="/tasks">Tarefas</a></li>
-                <li class="nav-item active"><a class="nav-link" href="/profile">Perfil</a></li>
+                <li class="nav-item"><a class="nav-link" href="/profile">Perfil</a></li>
                 <li class="nav-item"><a class="nav-link" href="/auth/logout">Sair</a></li>
             </ul>
         </div>
     </nav>
 
-    <div class="container mt-5">
+      <div class="container mt-5">
         <h1 class="mb-4">Exercício: <%= exercise.topic %></h1>
-
+    
         <div class="card">
             <div class="card-body">
                 <pre><%= exercise.content %></pre>
             </div>
         </div>
-
+    
+        <!-- Verificar se o exercício já foi completado -->
+        <% if (exercise.completed) { %>
+            <p class="text-danger mt-3">Este exercício já foi completado. Você não pode mais responder.</p>
+        <% } else { %>
+            <!-- Mostrar o número de tentativas restantes -->
+            <p class="text-warning mt-3">Tentativas restantes: <%= 3 - exercise.attempts %></p>
+    
+            <!-- Formulário para o usuário responder o exercício -->
+            <form id="exerciseForm" method="POST" action="/exercises/submit/<%= exercise._id %>">
+                <div class="form-group">
+                    <label for="userAnswer">Sua Resposta:</label>
+                    <textarea id="userAnswer" name="userAnswer" class="form-control" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Enviar Resposta</button>
+            </form>
+        <% } %>
+    
         <a href="/exercises" class="btn btn-secondary mt-3">Voltar para Exercícios</a>
+    </div>
+    <button id="viewAnswer" class="btn btn-warning">Visualizar Resposta</button>
+
+    <!-- Área onde a resposta será exibida -->
+    <div id="answerArea" class="mt-3" style="display: none;">
+        <p id="answerText"></p>
+        <p class="text-danger">Este exercício foi fechado e não pode mais ser respondido.</p>
     </div>
 
     <footer>
@@ -40,7 +70,31 @@
             <p>&copy; 2024 MeuApp - Todos os direitos reservados</p>
         </div>
     </footer>
+    <script>
+        // Função para verificar a resposta correta
+        document.getElementById('viewAnswer').addEventListener('click', async function() {
+    const exerciseId = '<%= exercise._id %>';
+    
+    try {
+      const response = await fetch(`/exercises/check-answer/${exerciseId}`);
+      const data = await response.json();
 
+      if (data.success) {
+        // Exibe a resposta correta e a mensagem
+        document.getElementById('answerText').textContent = 'Resposta correta: ' + data.answer;
+        document.getElementById('answerArea').style.display = 'block';
+
+        // Esconde o botão de visualização da resposta
+        document.getElementById('viewAnswer').style.display = 'none';
+      } else {
+        alert(data.message || 'Erro ao buscar a resposta.');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar a resposta:', error);
+      alert('Erro ao buscar a resposta.');
+    }
+  });
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

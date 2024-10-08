@@ -17,7 +17,11 @@ const UserSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
-  }
+  },
+  points: {
+    type: Number,
+    default: 0, // Inicialmente o usuário começa com 0 pontos
+  },
 });
 
 const User = mongoose.model('User', UserSchema);
